@@ -1,0 +1,6 @@
+[submodule "chunk-attention-tk"]
+	path = chunk-attention-tk
+	url = https://github.com/jacksontromero/chunk-attention-tk.git
+[submodule "hydragen-tk"]
+	path = hydragen-tk
+	url = https://github.com/ayushk7102/hydragen-tk.git

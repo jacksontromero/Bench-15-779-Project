@@ -1,0 +1,16 @@
+# Backup directories (can be removed after verifying submodules work)
+chunk-attention-tk-backup/
+hydragen-tk-backup/
+
+# Project documentation files
+background.txt
+milestone_report.md
+
+# Common ignore patterns
+.DS_Store
+*.pyc
+__pycache__/
+*.swp
+*.swo
+*~
+
