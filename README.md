@@ -1,6 +1,6 @@
 # 15-779 Project: Prefix-Aware Attention (Bench Harness + Results)
 
-This repository is a **single standalone repo** (no git submodules) that contains:
+This repository contains:
 - **`chunk-attention-tk/`**: the ChunkAttention + ThunderKittens codebase (vendored).
 - **`hydragen-tk/`**: the Hydragen + TK codebase (vendored).
 - **`bench/`**: benchmarking + plotting scripts 
