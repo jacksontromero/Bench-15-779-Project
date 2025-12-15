@@ -132,7 +132,7 @@ int main(int argc, char** argv) {
     const int warmup = parse_int_flag(argc, argv, "--warmup", 50);
     const int iters = parse_int_flag(argc, argv, "--iters", 200);
 
-    constexpr int n_seqs = 32;
+    constexpr int n_seqs = 64;  // Match TK kernel (requires 64 for 4 warps × 16 rows each)
     constexpr int chunk_size = 64;
     constexpr int d_head = 128;
 
