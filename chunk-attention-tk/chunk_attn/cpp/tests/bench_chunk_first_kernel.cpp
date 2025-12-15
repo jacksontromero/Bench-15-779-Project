@@ -1,3 +1,4 @@
+#include <cassert>
 #include <ATen/cuda/CUDAContext.h>
 #include <cuda_runtime.h>
 #include <torch/torch.h>
@@ -74,12 +75,69 @@ static void print_csv_header() {
     std::cout << "n_seqs,n_heads,n_chunks,blocks,latency_ms,tflops,compute_eff_pct,kv_gbps,kv_mem_eff_pct\n";
 }
 
-static void bench_one(int n_seqs, int n_heads, int n_chunks, int chunk_size, int d_head, int warmup, int iters) {
+static void setup_kernel_context(GPT::KernelContext& context, std::vector<GPT::ChunkInfo>& chunk_infos, int n_seqs) {
+    int n_chunks = chunk_infos.size();
+    int n_shared_chunks = 0;
+    for (auto& chunk_info : chunk_infos) {
+        int n = chunk_info.seq_idx_end - chunk_info.seq_idx_begin;
+        if (n > context.tpp_threshold) {
+            n_shared_chunks++;
+        }
+    }
+
+    auto host_options = torch::TensorOptions().device(torch::kCPU).dtype(torch::kInt32);
+    auto host_ptr_options = torch::TensorOptions().device(torch::kCPU).dtype(torch::kInt64);
+
+    torch::Tensor begins_ends_offsets_host = torch::empty({3, n_shared_chunks}, host_options);
+    int* begins_host_ptr = begins_ends_offsets_host.data_ptr<int>();
+    int* ends_host_ptr = begins_host_ptr + n_shared_chunks;
+    int* offsets_host_ptr = ends_host_ptr + n_shared_chunks;
+
+    int shared_chunks_visited = 0;
+    int partial_attn_dim = 0;
+    for (auto& chunk_info : chunk_infos) {
+        int n = chunk_info.seq_idx_end - chunk_info.seq_idx_begin;
+        if (n <= context.tpp_threshold) continue;
+
+        begins_host_ptr[shared_chunks_visited] = chunk_info.seq_idx_begin;
+        ends_host_ptr[shared_chunks_visited] = chunk_info.seq_idx_end;
+        offsets_host_ptr[shared_chunks_visited] = partial_attn_dim;
+        partial_attn_dim += n;
+        shared_chunks_visited++;
+    }
+
+    torch::Tensor keys_values_host = torch::empty({2, n_chunks}, host_ptr_options);
+    void** keys_host_ptr = reinterpret_cast<void**>(keys_values_host.data_ptr());
+    void** values_host_ptr = keys_host_ptr + n_chunks;
+
+    int idx = 0;
+    for (auto& chunk_info : chunk_infos) {
+        keys_host_ptr[idx] = chunk_info.chunk->key_ptr();
+        values_host_ptr[idx] = chunk_info.chunk->value_ptr();
+        idx++;
+    }
+
+    auto device = context.options.device();
+    context.begins_ends_offsets = begins_ends_offsets_host.to(device, torch::kInt32);
+    context.keys_values = keys_values_host.to(device, torch::kInt64);
+    
+    // Resize intermediate result tensors
+    context.attns = torch::empty({partial_attn_dim, context.n_heads, context.d_head}, context.options);
+    context.maxs_sums = torch::empty({2, partial_attn_dim, context.n_heads}, context.options.dtype(torch::kFloat32));
+
+    context.n_chunks = n_chunks;
+    context.n_shared_chunks = n_shared_chunks;
+    context.valid = true;
+    context.delta_tokens = 0;
+}
+
+static void bench_one(int n_seqs, int n_heads, int n_chunks, int chunk_size, int d_head, int warmup, int iters, int device_id) {
     constexpr double H100_FP16_TFLOPS = 989.0; // used in existing result CSVs in this repo
     constexpr double H100_HBM3_PEAK_GBPS = 3350.0;
 
+    if (device_id < 0) device_id = 0;
     auto options = torch::TensorOptions()
-                      .device(torch::kCUDA)
+                      .device(torch::Device(torch::kCUDA, device_id))
                       .dtype(torch::kFloat16);
 
     // Build a minimal kernel context with n_chunks shared-prefix chunks.
@@ -95,7 +153,15 @@ static void bench_one(int n_seqs, int n_heads, int n_chunks, int chunk_size, int
         ch->value().zero_();
         chunk_infos.emplace_back(ch, /*seq_idx_begin=*/0, /*seq_idx_end=*/n_seqs);
     }
-    GPT::refresh_kernel_context(ctx, chunk_infos, n_seqs);
+    
+    // Use manual setup instead of linked GPT::refresh_kernel_context
+    setup_kernel_context(ctx, chunk_infos, n_seqs);
+
+    std::cout << "DEBUG: n_shared_chunks=" << ctx.n_shared_chunks << std::endl;
+    assert(ctx.n_shared_chunks > 0);
+    assert(ctx.keys_values.data_ptr() != nullptr);
+    assert(ctx.begins_ends_offsets.data_ptr() != nullptr);
+    assert(ctx.attns.sizes().size() == 3);
 
     // Query layout expected by kernel: [n_seqs, n_heads, d_head]
     auto query = torch::zeros({n_seqs, n_heads, d_head}, options);
@@ -128,6 +194,7 @@ int main(int argc, char** argv) {
     }
 
     set_device_from_flags(argc, argv);
+    int dev = parse_int_flag(argc, argv, "--device", 0);
 
     const int warmup = parse_int_flag(argc, argv, "--warmup", 50);
     const int iters = parse_int_flag(argc, argv, "--iters", 200);
@@ -145,7 +212,7 @@ int main(int argc, char** argv) {
             std::cerr << "Error: --bench requires --n-heads <H> and --n-chunks <C>\n";
             return 2;
         }
-        bench_one(n_seqs, n_heads, n_chunks, chunk_size, d_head, warmup, iters);
+        bench_one(n_seqs, n_heads, n_chunks, chunk_size, d_head, warmup, iters, dev);
         return 0;
     }
 
@@ -158,7 +225,7 @@ int main(int argc, char** argv) {
           {64, 64},
         };
         for (auto cfg : sweep) {
-            bench_one(n_seqs, cfg.h, cfg.c, chunk_size, d_head, warmup, iters);
+            bench_one(n_seqs, cfg.h, cfg.c, chunk_size, d_head, warmup, iters, dev);
         }
         return 0;
     }
@@ -166,4 +233,3 @@ int main(int argc, char** argv) {
     std::cerr << "Error: first argument must be --bench or --sweep\n";
     return 2;
 }
-

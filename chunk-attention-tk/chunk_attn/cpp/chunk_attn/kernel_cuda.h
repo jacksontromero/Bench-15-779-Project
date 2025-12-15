@@ -14,6 +14,7 @@ struct KernelContext {
         this->options = options;
 
         valid = false;
+        tpp_threshold = 32;
         delta_tokens = 0;
 
         if (!options.device().is_cuda()) {
