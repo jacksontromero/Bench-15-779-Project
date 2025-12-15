@@ -399,6 +399,12 @@ int main(int argc, char** argv) {
           {32, 16}, {8, 64},
           {64, 16}, {16, 64},
           {64, 64},
+          {128, 64},
+          {64, 128},
+          {128, 128},
+          {256, 128},
+          {128, 256},
+          {256, 256},
         };
         for (auto cfg : sweep) {
             bench_and_print_row(cfg.h, cfg.c, warmup, iters);

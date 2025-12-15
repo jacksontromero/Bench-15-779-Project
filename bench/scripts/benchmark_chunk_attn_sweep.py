@@ -141,6 +141,12 @@ def main() -> None:
         Cfg(64, 64, 16),
         Cfg(64, 16, 64),
         Cfg(64, 64, 64),
+        Cfg(64, 128, 64),
+        Cfg(64, 64, 128),
+        Cfg(64, 128, 128),
+        Cfg(64, 256, 128),
+        Cfg(64, 128, 256),
+        Cfg(64, 256, 256),
     ]
 
     os.makedirs(os.path.dirname(args.csv) or ".", exist_ok=True)

@@ -38,8 +38,8 @@ set logscale y 10
 set format x "%g"
 set format y "%.3g"
 plot \
-  tk using col_blocks:col_latency with linespoints lw 2 pt 7 ps 1.1 lc rgb TK_COLOR title "TK (bf16, 64t)", \
-  native using col_blocks:col_latency with linespoints lw 2 pt 5 ps 1.1 lc rgb NATIVE_COLOR title "Native (fp16, 128t)"
+  tk using col_blocks:col_latency with linespoints lw 2 pt 7 ps 1.1 lc rgb TK_COLOR title "TK (bf16)", \
+  native using col_blocks:col_latency with linespoints lw 2 pt 5 ps 1.1 lc rgb NATIVE_COLOR title "Native (fp16)"
 
 # -----------------------------------------------------------------------------
 # Throughput scaling
