@@ -89,8 +89,10 @@ static float bench_kernel_ms(int n_heads, int n_chunks, int warmup, int iters) {
 
     cudaMalloc(&d_q, q_size * sizeof(bf16));
     cudaMalloc(&d_output, out_size * sizeof(bf16));
+    CUDA_CHECK();
     cudaMemset(d_output, 0, out_size * sizeof(bf16));
     cudaMemset(d_q, 0, q_size * sizeof(bf16));
+    CUDA_CHECK();
 
     for (int c = 0; c < n_chunks; c++) {
         cudaMalloc(&d_k[c], kv_size * sizeof(bf16));
@@ -98,6 +100,7 @@ static float bench_kernel_ms(int n_heads, int n_chunks, int warmup, int iters) {
         cudaMemset(d_k[c], 0, kv_size * sizeof(bf16));
         cudaMemset(d_v[c], 0, kv_size * sizeof(bf16));
     }
+    CUDA_CHECK();
 
     // Metadata for chunks
     cudaMalloc(&d_offsets, n_chunks * sizeof(int));
@@ -123,8 +126,10 @@ static float bench_kernel_ms(int n_heads, int n_chunks, int warmup, int iters) {
     for (int c = 0; c < n_chunks; c++) { h_keys[c] = d_k[c]; h_vals[c] = d_v[c]; }
     cudaMalloc(&d_keys, n_chunks * sizeof(void*));
     cudaMalloc(&d_vals, n_chunks * sizeof(void*));
+    CUDA_CHECK();
     cudaMemcpy(d_keys, h_keys.data(), n_chunks * sizeof(void*), cudaMemcpyHostToDevice);
     cudaMemcpy(d_vals, h_vals.data(), n_chunks * sizeof(void*), cudaMemcpyHostToDevice);
+    CUDA_CHECK();
 
     // Setup mappings
     std::vector<int> h_seq_chunk_map(n_seqs * n_chunks);
@@ -166,16 +171,23 @@ static float bench_kernel_ms(int n_heads, int n_chunks, int warmup, int iters) {
         .delta_tokens = 0
     };
 
-    // Compute shared memory size
-    size_t smem = D_HEAD * sizeof(bf16) +                              // Q_sv
-                  NUM_WARPS_SF * D_HEAD * sizeof(float) +              // all_out_sv (float)
-                  NUM_WARPS_SF * CHUNK_SIZE * D_HEAD * sizeof(bf16) +  // all_KV_s
-                  D_HEAD * sizeof(bf16);                               // final_out_sv
+    // Compute shared memory size using sizeof for actual TK type sizes
+    // Q_sv: sv<bf16, d_head>
+    // all_out_sv: sv<float, d_head>[NUM_WARPS]
+    // all_scores_sv: sv<float, chunk_size>[NUM_WARPS]
+    // all_KV_st: st<bf16, chunk_size, d_head>[NUM_WARPS]
+    size_t smem = sizeof(sv<bf16, D_HEAD>) +                           // Q_sv
+                  sizeof(sv<float, D_HEAD>) * NUM_WARPS_SF +           // all_out_sv
+                  sizeof(sv<float, CHUNK_SIZE>) * NUM_WARPS_SF +       // all_scores_sv
+                  sizeof(st<bf16, CHUNK_SIZE, D_HEAD>) * NUM_WARPS_SF + // all_KV_st
+                  16384;                                               // Safety padding for alignment
     smem = ((smem + 4095) / 4096) * 4096;
 
     cudaFuncSetAttribute(attn_seq_first_tk<CHUNK_SIZE, D_HEAD>,
                          cudaFuncAttributeMaxDynamicSharedMemorySize, smem);
     CUDA_CHECK();
+
+    // std::cout << "Launching kernel warmup..." << std::endl;
 
     dim3 grid(n_heads, n_seqs);
 
@@ -195,6 +207,7 @@ static float bench_kernel_ms(int n_heads, int n_chunks, int warmup, int iters) {
     }
     cudaEventRecord(stop);
     cudaEventSynchronize(stop);
+    CUDA_CHECK(); // Check for kernel errors
 
     float ms = 0.0f;
     cudaEventElapsedTime(&ms, start, stop);
@@ -364,6 +377,7 @@ int main(int argc, char** argv) {
     }
 
     if (strcmp(argv[1], "--sweep") == 0) {
+        std::cout << "Starting sweep...\n";
         const int warmup = parse_int_flag(argc, argv, "--warmup", 50);
         const int iters = parse_int_flag(argc, argv, "--iters", 200);
         print_csv_header();
@@ -380,6 +394,7 @@ int main(int argc, char** argv) {
           {128, 128},
         };
         for (auto cfg : sweep) {
+            std::cout << "Benchmarking H=" << cfg.h << " C=" << cfg.c << "..." << std::endl;
             bench_and_print_row(cfg.h, cfg.c, warmup, iters);
         }
         return 0;
@@ -572,16 +587,16 @@ int main(int argc, char** argv) {
         .delta_tokens = 0
     };
 
-    // Compute shared memory size
-    // Q_sv: d_head * sizeof(bf16)
-    // all_out_sv: NUM_WARPS * d_head * sizeof(float)
-    // all_KV_s: NUM_WARPS * chunk_size * d_head * sizeof(bf16)
-    // final_out_sv: d_head * sizeof(bf16)
-    // warp_max/sum handled separately
-    size_t smem = D_HEAD * sizeof(bf16) +                              // Q_sv
-                  NUM_WARPS_SF * D_HEAD * sizeof(float) +              // all_out_sv (float)
-                  NUM_WARPS_SF * CHUNK_SIZE * D_HEAD * sizeof(bf16) +  // all_KV_s
-                  D_HEAD * sizeof(bf16);                               // final_out_sv
+    // Compute shared memory size using sizeof for actual TK type sizes
+    // Q_sv: sv<bf16, d_head>
+    // all_out_sv: sv<float, d_head>[NUM_WARPS]
+    // all_scores_sv: sv<float, chunk_size>[NUM_WARPS]
+    // all_KV_st: st<bf16, chunk_size, d_head>[NUM_WARPS]
+    size_t smem = sizeof(sv<bf16, D_HEAD>) +                           // Q_sv
+                  sizeof(sv<float, D_HEAD>) * NUM_WARPS_SF +           // all_out_sv
+                  sizeof(sv<float, CHUNK_SIZE>) * NUM_WARPS_SF +       // all_scores_sv
+                  sizeof(st<bf16, CHUNK_SIZE, D_HEAD>) * NUM_WARPS_SF + // all_KV_st
+                  16384;                                               // Safety padding for alignment
     smem = ((smem + 4095) / 4096) * 4096;
 
     cudaFuncSetAttribute(attn_seq_first_tk<CHUNK_SIZE, D_HEAD>,
