@@ -19,7 +19,7 @@ set -euo pipefail
 #
 # Examples:
 #   # Default (ChunkAttention TK):
-#   ./bench/scripts/run_tk_sweep.sh --out results/chunk_attn_tk/sweep_kv_4warp.csv
+#   ./bench/scripts/run_tk_sweep.sh --out results/chunk_attn_tk/sweep.csv
 #
 #   # Run a single point:
 #   ./bench/scripts/run_tk_sweep.sh -- --bench --n-heads 32 --n-chunks 16 --warmup 50 --iters 200
@@ -36,7 +36,7 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
 KERNEL_DIR="chunk-attention-tk/ThunderKittens/kernels/chunked_attn"
 BIN_NAME="attn_chunk_first"
-OUT_CSV="results/chunk_attn_tk/sweep_kv_4warp.csv"
+OUT_CSV="results/chunk_attn_tk/sweep.csv"
 
 EXTRA_ARGS=()
 while [[ $# -gt 0 ]]; do

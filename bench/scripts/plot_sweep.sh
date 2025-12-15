@@ -5,7 +5,7 @@ set -euo pipefail
 #   ./plot_sweep.sh <csv> <outdir> [--plot_script <path/to/plot_sweep.gp>]
 #
 # Example:
-#   ./plot_sweep.sh ../../results/chunk_attn_tk/sweep_kv_4warp.csv ../../results/chunk_attn_tk/minimal_plots_4warp
+#   ./plot_sweep.sh ../../results/chunk_attn_tk/sweep.csv ../../results/chunk_attn_tk/minimal_plots
 
 DATAFILE=${1:?missing csv path}
 OUTDIR=${2:?missing output directory}

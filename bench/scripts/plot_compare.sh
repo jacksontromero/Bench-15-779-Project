@@ -6,9 +6,9 @@ set -euo pipefail
 #
 # Example:
 #   ./plot_compare.sh \
-#     ../../results/chunk_attn_tk/sweep_kv_4warp.csv \
+#     ../../results/chunk_attn_tk/sweep.csv \
 #     ../../results/chunk_attn_native/sweep_native_kernel_only.csv \
-#     ../../results/chunk_attn_tk/comparison_vs_native_4warp
+#     ../../results/chunk_attn_tk/comparison_vs_native
 
 TK_CSV=${1:?missing tk csv path}
 NATIVE_CSV=${2:?missing native csv path}

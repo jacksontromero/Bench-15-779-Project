@@ -2,7 +2,7 @@
 """CUDA-event benchmark sweep for native chunk_attn.
 
 This is intended to mirror the ThunderKittens chunked_attn sweep where
-blocks = n_heads * n_chunks and n_seqs=32, chunk_size=64, d_head=128.
+blocks = n_heads * n_chunks and n_seqs=64, chunk_size=64, d_head=128.
 
 Example (on Bridges2 H100 node):
   export HOSTNAME=$(hostname)
@@ -129,18 +129,18 @@ def main() -> None:
     args = ap.parse_args()
 
     cfgs = [
-        Cfg(32, 4, 4),
-        Cfg(32, 4, 8),
-        Cfg(32, 4, 16),
-        Cfg(32, 4, 32),
-        Cfg(32, 4, 64),
-        Cfg(32, 16, 16),
-        Cfg(32, 32, 8),
-        Cfg(32, 32, 16),
-        Cfg(32, 8, 64),
-        Cfg(32, 64, 16),
-        Cfg(32, 16, 64),
-        Cfg(32, 64, 64),
+        Cfg(64, 4, 4),
+        Cfg(64, 4, 8),
+        Cfg(64, 4, 16),
+        Cfg(64, 4, 32),
+        Cfg(64, 4, 64),
+        Cfg(64, 16, 16),
+        Cfg(64, 32, 8),
+        Cfg(64, 32, 16),
+        Cfg(64, 8, 64),
+        Cfg(64, 64, 16),
+        Cfg(64, 16, 64),
+        Cfg(64, 64, 64),
     ]
 
     os.makedirs(os.path.dirname(args.csv) or ".", exist_ok=True)
