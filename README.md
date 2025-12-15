@@ -96,17 +96,6 @@ cd bench/scripts
 ```bash
 export HOSTNAME=$(hostname)
 module load gcc/13.3.1-p20240614 cuda/12.6.1
-
-# If `import chunk_attn` fails, build+install the extension first:
-# (this populates `chunk_attn/lib/chunk_attn_c*.so` via the `chunk_attn_whl` target)
-# cmake -S chunk-attention-tk/chunk_attn -B chunk-attention-tk/chunk_attn/build \
-#   -DUSE_CUDA=ON -DUSE_MKL=OFF \
-#   -DTORCH="$(python -c 'import torch.utils; print(torch.utils.cmake_prefix_path)')" \
-#   -DPYTHON_EXECUTABLE="$(which python)" \
-#   -DPython3_EXECUTABLE="$(which python)" \
-#   -DPython3_ROOT_DIR="$(python -c 'import sys; import pathlib; print(pathlib.Path(sys.executable).resolve().parent.parent)')"
-# cmake --build chunk-attention-tk/chunk_attn/build -j --target chunk_attn_whl
-
 python bench/scripts/benchmark_chunk_attn_sweep.py \
   --csv results/chunk_attn_native/sweep_native.csv
 ```
@@ -121,13 +110,6 @@ module load gcc/13.3.1-p20240614 cuda/12.6.1
 
 # Default: build+run the ChunkAttention TK kernel sweep (writes CSV)
 ./bench/scripts/run_tk_sweep.sh --out results/chunk_attn_tk/sweep_kv_4warp.csv
-
-# Benchmark a teammate's TK kernel:
-# ./bench/scripts/run_tk_sweep.sh \
-#   --kernel_dir hydragen-tk/ThunderKittens/kernels/<their_kernel_dir> \
-#   --bin <their_binary_name> \
-#   --out results/hydragen_tk/sweep.csv \
-#   -- --sweep --warmup 50 --iters 200
 ```
 
 ### 2c) Run the native kernel-only sweep (C++ executable)
