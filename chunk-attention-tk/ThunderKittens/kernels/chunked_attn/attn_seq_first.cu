@@ -73,7 +73,7 @@ struct attn_seq_first_globals {
 };
 
 // ============================================================================
-// Phase 2: Scalar dot product
+// Phase 2: Scalar dot product with TK primitives
 // ============================================================================
 template<int d_head>
 __device__ __forceinline__ float compute_dot_product_tk(
@@ -165,9 +165,8 @@ attn_seq_first_tk(const __grid_constant__ attn_seq_first_globals<chunk_size, d_h
 
     // ========================================================================
     // TK Register types for softmax ops (16-element vectors)
-    // We'll process scores in 16-element chunks to use TK rv primitives
     // ========================================================================
-    constexpr int SCORE_CHUNK = 16;  // TK minimum vector size
+    constexpr int SCORE_CHUNK = 16;
     using score_rv_t = rv<float, SCORE_CHUNK, ducks::rv_layout::naive>;
 
     float score_max = -INFINITY;
@@ -227,7 +226,7 @@ attn_seq_first_tk(const __grid_constant__ attn_seq_first_globals<chunk_size, d_h
         const bf16* K_smem = &KV_st.data[0];
 
         // ================================================================
-        // Compute Q @ K^T scores
+        // Compute Q @ K^T scores using scalar dot products
         // ================================================================
         #pragma unroll
         for (int r = 0; r < chunk_size; r++) {
@@ -249,60 +248,51 @@ attn_seq_first_tk(const __grid_constant__ attn_seq_first_globals<chunk_size, d_h
         __syncwarp();
 
         // ================================================================
-        // Softmax using TK register vectors (process in 16-element chunks)
+        // Softmax using TK register vectors
         // ================================================================
         float current_chunk_max = -INFINITY;
 
-        // Find max using TK rv operations
         #pragma unroll
         for (int sc = 0; sc < chunk_size / SCORE_CHUNK; sc++) {
             score_rv_t scores_rv;
-            // Load 16 scores into register vector
             #pragma unroll
             for (int j = 0; j < SCORE_CHUNK; j++) {
                 scores_rv[0][j] = scores_sv[sc * SCORE_CHUNK + j];
             }
 
             float chunk_max;
-            warp::max(chunk_max, scores_rv);  // TK reduction
+            warp::max(chunk_max, scores_rv);
             current_chunk_max = fmaxf(current_chunk_max, chunk_max);
         }
 
-        // Update global max and compute scaling factors
         float new_global_max = fmaxf(score_max, current_chunk_max);
         float scale_old = __expf(score_max - new_global_max);
         float scale_new = __expf(current_chunk_max - new_global_max);
         score_max = new_global_max;
 
-        // Scale existing output
         for (int d = lane; d < d_head; d += 32) {
             out_sv[d] = out_sv[d] * scale_old;
         }
         __syncwarp();
 
-        // Compute exp(score - max) and sum using TK rv operations
         float current_chunk_sum = 0.0f;
 
         #pragma unroll
         for (int sc = 0; sc < chunk_size / SCORE_CHUNK; sc++) {
             score_rv_t scores_rv;
 
-            // Load scores
             #pragma unroll
             for (int j = 0; j < SCORE_CHUNK; j++) {
                 scores_rv[0][j] = scores_sv[sc * SCORE_CHUNK + j];
             }
 
-            // TK subtract and exp
             warp::sub(scores_rv, scores_rv, current_chunk_max);
             warp::exp(scores_rv, scores_rv);
 
-            // TK sum reduction
             float chunk_sum;
             warp::sum(chunk_sum, scores_rv);
             current_chunk_sum += chunk_sum;
 
-            // Store exp scores back
             #pragma unroll
             for (int j = 0; j < SCORE_CHUNK; j++) {
                 scores_sv[sc * SCORE_CHUNK + j] = scores_rv[0][j];
@@ -353,7 +343,7 @@ attn_seq_first_tk(const __grid_constant__ attn_seq_first_globals<chunk_size, d_h
         max_rv[0][0] = (lane < NUM_WARPS) ? warp_max[lane] : -INFINITY;
 
         float global_max;
-        warp::max(global_max, max_rv);  // TK reduction
+        warp::max(global_max, max_rv);
 
         float my_scale = (lane < NUM_WARPS) ? __expf(warp_max[lane] - global_max) : 0.0f;
         if (lane < NUM_WARPS) warp_scale[lane] = my_scale;
@@ -362,7 +352,7 @@ attn_seq_first_tk(const __grid_constant__ attn_seq_first_globals<chunk_size, d_h
         sum_rv[0][0] = (lane < NUM_WARPS) ? (warp_sum[lane] * my_scale) : 0.0f;
 
         float total_sum;
-        warp::sum(total_sum, sum_rv);  // TK reduction
+        warp::sum(total_sum, sum_rv);
 
         if (lane == 0) {
             inv_sum_s = __fdividef(1.0f, total_sum + 1e-6f);

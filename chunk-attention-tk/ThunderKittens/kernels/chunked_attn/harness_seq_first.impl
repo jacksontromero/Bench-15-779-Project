@@ -171,7 +171,7 @@ static float bench_kernel_ms(int n_heads, int n_chunks, int warmup, int iters) {
         .delta_tokens = 0
     };
 
-    // Compute shared memory size using sizeof for actual TK type sizes
+    // Compute shared memory size using sizeof for actual TK type sizes (Phase 2)
     // Q_sv: sv<bf16, d_head>
     // all_out_sv: sv<float, d_head>[NUM_WARPS]
     // all_scores_sv: sv<float, chunk_size>[NUM_WARPS]
@@ -180,7 +180,7 @@ static float bench_kernel_ms(int n_heads, int n_chunks, int warmup, int iters) {
                   sizeof(sv<float, D_HEAD>) * NUM_WARPS_SF +           // all_out_sv
                   sizeof(sv<float, CHUNK_SIZE>) * NUM_WARPS_SF +       // all_scores_sv
                   sizeof(st<bf16, CHUNK_SIZE, D_HEAD>) * NUM_WARPS_SF + // all_KV_st
-                  16384;                                               // Safety padding for alignment
+                  16384;                                               // Safety padding
     smem = ((smem + 4095) / 4096) * 4096;
 
     cudaFuncSetAttribute(attn_seq_first_tk<CHUNK_SIZE, D_HEAD>,
@@ -587,7 +587,7 @@ int main(int argc, char** argv) {
         .delta_tokens = 0
     };
 
-    // Compute shared memory size using sizeof for actual TK type sizes
+    // Compute shared memory size using sizeof for actual TK type sizes (Phase 2)
     // Q_sv: sv<bf16, d_head>
     // all_out_sv: sv<float, d_head>[NUM_WARPS]
     // all_scores_sv: sv<float, chunk_size>[NUM_WARPS]
@@ -596,7 +596,7 @@ int main(int argc, char** argv) {
                   sizeof(sv<float, D_HEAD>) * NUM_WARPS_SF +           // all_out_sv
                   sizeof(sv<float, CHUNK_SIZE>) * NUM_WARPS_SF +       // all_scores_sv
                   sizeof(st<bf16, CHUNK_SIZE, D_HEAD>) * NUM_WARPS_SF + // all_KV_st
-                  16384;                                               // Safety padding for alignment
+                  16384;                                               // Safety padding
     smem = ((smem + 4095) / 4096) * 4096;
 
     cudaFuncSetAttribute(attn_seq_first_tk<CHUNK_SIZE, D_HEAD>,

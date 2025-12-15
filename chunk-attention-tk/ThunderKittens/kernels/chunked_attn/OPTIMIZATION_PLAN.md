@@ -2,94 +2,68 @@
 
 ## Executive Summary
 
-The TK seq-first kernel (`attn_seq_first.cu`) is being optimized to match and exceed the native CUDA implementation. The approach uses a **phased strategy**: Phase 2 implements scalar operations with micro-tiling to avoid register pressure, then Phase 3 will add Tensor Core acceleration.
+The TK seq-first kernel (`attn_seq_first.cu`) has been optimized using TK primitives. Phase 2 (scalar operations with TK memory management) is complete and working. Phase 3 (MMA integration) was attempted but requires further work due to challenges with TK's register tile layout.
 
-## Architecture Comparison
+## Current Status
 
-### Chunk-First Kernel (Working Reference)
-- **MMAs**: Uses `warpgroup::mm_ABt` (H100 tensor cores).
-- **Status**: Production ready.
-- See `attn_chunk_first.cu` for working TK patterns.
+### Phase 2: Scalar Tiling with TK Primitives [COMPLETED ✓]
 
-### Seq-First Kernel (Optimization Target)
+**Metrics**:
+- Registers: 128 (0 spills)
+- All 32/32 small tests pass
+- Benchmarks complete successfully
+
+**Implementation**:
+- TK `shared_allocator` for memory management
+- TK types: `sv<bf16, d_head>`, `sv<float, d_head>`, `sv<float, chunk_size>`, `st<bf16, chunk_size, d_head>`
+- TK softmax primitives: `warp::max`, `warp::sum`, `warp::sub`, `warp::exp`
+- Scalar dot products for Q @ K^T
+- Manual weighted sum for scores @ V
+
+### Phase 3: MMA Integration [PARTIAL / NEEDS WORK]
+
+**Attempted approach**:
+1. Broadcast Q to a register tile using `warp::broadcast_col`
+2. Use `warp::mma_ABt` for Q @ K^T computation
+3. Use `warp::mma_AB` with `warp::swap_layout` for scores @ V
+
+**Challenges encountered**:
+1. **Register tile extraction**: TK's `rt` types have complex internal layouts. Extracting a single row (which is what we need since Q is broadcast) is non-trivial.
+2. **Layout requirements**: `warp::mma_AB` requires B to be in `col_layout`, requiring `warp::swap_layout` which adds overhead.
+3. **Shared memory pressure**: Additional tiles for MMA intermediate results increased shared memory from ~85KB to ~155KB.
+4. **Stack frame growth**: Phase 3 prototype used 168 registers and 368 bytes stack frame.
+
+**Recommendation for Phase 3**:
+For the seq-first kernel where Q is a single vector (not a tile), MMA may not be the right approach because:
+- The 16×16 MMA output contains 16 identical copies of the same result (wasted computation)
+- Extracting useful data from register tiles requires storing to shared memory and reading back
+- The overhead may exceed benefits for vector-matrix products
+
+**Alternative approaches to explore**:
+1. Use CUDA Cores (current Phase 2) - already efficient for this pattern
+2. Consider restructuring to batch multiple sequences per block (seq-first → hybrid)
+3. Use `warp::dot` for efficient vector-dot-vector operations per K row
+
+---
+
+## Architecture Overview
+
+### Seq-First Kernel Pattern
 - **Grid**: (n_heads, n_seqs) - one block per (head, sequence) pair
 - **Warps**: 4 warps, each processes multiple chunks in round-robin
-- **Algorithm**: Vector-matrix products (Q is 1×d_head, not a tile)
+- **Core Operation**: Q (1×d_head) · K^T (d_head×chunk_size) = scores (1×chunk_size)
 
-### Native CUDA Seq-First (Reference)
-- **Compute**: SIMD `HFMA2` (CUDA Cores).
-- **Tiling**: Streams small tiles via `warp_vect_mul_raw_major_matrix_v2`.
-- **Key insight**: Q is a VECTOR, not a matrix. Each warp computes Q·K^T as a vector-matrix product.
-
----
-
-## Root Cause Analysis
-
-### Critical Issue 1: Register Pressure
-Previous TK version loaded 64x128 `float` tiles (32KB), causing massive spills.
-**Fix**: Implemented `SUBTILE_ROWS = 16`. Stream 16 K/V rows at a time.
-
-### Critical Issue 2: Incorrect MMA Usage (CURRENT BUG)
-The current code incorrectly uses `warp::mma_ABt` for Phase 2. This is wrong because:
-1. Q is a vector (1×d_head), not a tile - MMA is wasteful
-2. Type mismatches: scores computed as `rt<float,16,16>` but stored to `col_vec<rt<bf16,...>>`
-3. Extracting row 0 from a 16×16 MMA result is overly complex
-
-**Fix (This Plan)**: Revert to scalar dot products for Phase 2.
-
----
-
-## Optimization Strategies
-
-### Phase 2: Scalar Tiling with TK Primitives [IN PROGRESS]
-
-**Goal**: Correct implementation using scalar operations (no MMA).
-
-**Algorithm per warp, per chunk**:
-```
-1. Load K subtile (16 × d_head) to registers
-2. For each of 16 K rows: score[i] = dot(Q, K[i])  // Manual dot product
-3. Apply masking if last chunk
-4. Update running max, compute exp(score - max)
-5. Accumulate sum of exp scores
-6. Load V subtile (16 × d_head)
-7. For each of 16 V rows: out += exp_score[i] * V[i]
-8. Repeat for next 16-row subtile
-```
-
-**Implementation Checklist**:
-- [x] Use `shared_allocator` (linear layout, no swizzle)
-- [x] Implement `load_tile_async_warp_linear` for K/V loading
-- [ ] **FIX**: Remove MMA operations, use scalar dot products
-- [ ] **FIX**: Use `rv<float, chunk_size>` for scores (not bf16 col_vec)
-- [ ] **FIX**: Use `rv<float, d_head>` for output accumulation
-- [ ] Verify: Compiles with 0 spills, all tests pass
-
-**Key TK Primitives for Phase 2**:
-- `sv<bf16, d_head>` - Q in shared memory
-- `rv<float, 16>` - scores for one subtile (distributed across lanes)
-- `warp::max(scalar, rv)` - reduce vector to max
-- `warp::sum(scalar, rv)` - reduce vector to sum
-- `warp::sub(rv, rv, scalar)` - subtract max for numerical stability
-- `warp::exp(rv, rv)` - element-wise exp
-
-### Phase 3: MMA Integration (Tensor Cores) [FUTURE]
-
-**Goal**: After Phase 2 is working correctly, upgrade to Tensor Cores.
-
-**Approach**:
-1. Broadcast Q to 16 rows: `rt<bf16, 16, d_head>`
-2. Use `warp::mma_ABt` for Q @ K^T
-3. Extract row 0 from result (all rows are identical due to Q broadcast)
-4. Use `warp::mma_AB` for scores @ V
-
-**Note**: Only proceed to Phase 3 after Phase 2 passes all tests.
+### Why MMA is Challenging
+- Q is a **vector**, not a tile
+- MMA expects **tile × tile** operations (e.g., 16×k × k×16)
+- Broadcasting Q creates 16 identical rows → 16× redundant computation
+- Extracting results requires understanding TK's register tile data layout
 
 ---
 
 ## File Structure
 
-- `attn_seq_first.cu` - Kernel implementation
+- `attn_seq_first.cu` - Kernel implementation (Phase 2)
 - `harness_seq_first.impl` - Test harness
 - `tests_seq_first/` - Test data files
 - `run_tests_seq_first.sh` - Test runner script
@@ -102,8 +76,18 @@ conda activate myenv
 cd kernels/chunked_attn
 make clean && make
 ./run_tests_seq_first.sh
+./attn_seq_first --sweep --warmup 50 --iters 200
 ```
 
+## Performance Summary (Phase 2)
+
+| Configuration | Latency (ms) | TFLOPS | Compute Eff % |
+|--------------|--------------|--------|---------------|
+| H=4, C=4     | 0.019       | 1.77   | 0.18%         |
+| H=32, C=16   | 0.479       | 2.24   | 0.23%         |
+| H=64, C=64   | 3.77        | 2.28   | 0.23%         |
+| H=128, C=128 | 15.07       | 2.28   | 0.23%         |
+
 ## Success Metrics
-- **Phase 2**: All tests pass, 0 register spills
-- **Phase 3**: >1.2x speedup vs native kernel
+- **Phase 2**: All tests pass, 0 register spills ✓
+- **Phase 3**: Attempted, blocked by register tile layout complexity
