@@ -1,4 +1,3 @@
-Starting sweep...
 n_seqs,n_heads,n_chunks,blocks,latency_ms,tflops,compute_eff_pct,kv_gbps,kv_mem_eff_pct
 64,4,4,16,0.019061,1.7604,0.1780,27.51,0.8211
 64,4,8,32,0.034094,1.9683,0.1990,30.76,0.9181
