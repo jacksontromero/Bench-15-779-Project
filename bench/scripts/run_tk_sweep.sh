@@ -51,11 +51,11 @@ while [[ $# -gt 0 ]]; do
       shift
       EXTRA_ARGS+=("$@")
       break
-      ;;
+      ;; 
     *)
       echo "Unknown arg: $1" >&2
       exit 2
-      ;;
+      ;; 
   esac
 done
 
@@ -83,6 +83,7 @@ echo "[TK] binary=$BIN_ABS"
 echo "[TK] out_csv=$OUT_CSV_ABS"
 echo "[TK] THUNDERKITTENS_ROOT=$THUNDERKITTENS_ROOT"
 
+# Default behavior: build all
 make -C "$KERNEL_DIR_ABS" clean all
 
 if [[ ! -x "$BIN_ABS" ]]; then
@@ -98,4 +99,3 @@ echo "[TK] running: $BIN_ABS ${EXTRA_ARGS[*]}"
 "$BIN_ABS" "${EXTRA_ARGS[@]}" > "$OUT_CSV_ABS"
 
 echo "[TK] wrote: $OUT_CSV_ABS"
-
