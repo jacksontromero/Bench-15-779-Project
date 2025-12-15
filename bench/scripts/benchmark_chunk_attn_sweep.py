@@ -7,8 +7,7 @@ blocks = n_heads * n_chunks and n_seqs=32, chunk_size=64, d_head=128.
 Example (on Bridges2 H100 node):
   export HOSTNAME=$(hostname)
   module load gcc/13.3.1-p20240614 cuda/12.6.1
-  /jet/home/billyli/data_billyli/jason/miniconda3/bin/conda run -n cot \
-    python bench/scripts/benchmark_chunk_attn_sweep.py --csv results/chunk_attn_native/sweep_native.csv
+  python bench/scripts/benchmark_chunk_attn_sweep.py --csv results/chunk_attn_native/sweep_native.csv
 """
 
 import argparse
