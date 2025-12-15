@@ -380,7 +380,6 @@ int main(int argc, char** argv) {
           {128, 128},
         };
         for (auto cfg : sweep) {
-            std::cout << "Benchmarking: n_heads=" << cfg.h << " n_chunks=" << cfg.c << "\n";
             bench_and_print_row(cfg.h, cfg.c, warmup, iters);
         }
         return 0;

@@ -5,6 +5,80 @@ using namespace kittens;
 constexpr int NUM_WARPS = 4;
 constexpr int BLOCK_SIZE = NUM_WARPS * 32;
 
+// ============================================================================
+// Async memory copy helpers (cp.async for H100)
+// ============================================================================
+__device__ __forceinline__ void cp_async_commit() {
+    asm volatile("cp.async.commit_group;\n" ::);
+}
+
+template<int N>
+__device__ __forceinline__ void cp_async_wait() {
+    asm volatile("cp.async.wait_group %0;\n" :: "n"(N));
+}
+
+// 16-byte async copy (8 bf16 elements) using swizzled address
+__device__ __forceinline__ void cp_async_16_swizzled(uint32_t smem_addr, const void* gmem_ptr) {
+    asm volatile(
+        "cp.async.cg.shared.global.L2::128B [%0], [%1], 16;\n"
+        :: "r"(smem_addr), "l"(gmem_ptr)
+        : "memory"
+    );
+}
+
+// Async load from raw bf16 pointer into TK shared tile with proper swizzling
+// Uses TK's idx() function to compute swizzled destination addresses
+template<int ROWS, int COLS, int THREADS>
+__device__ __forceinline__ void load_tile_async(st<bf16, ROWS, COLS>& dst, const bf16* src) {
+    constexpr int elem_per_memcpy = 8;  // 16 bytes / 2 bytes per bf16
+    constexpr int memcpy_per_row = COLS / elem_per_memcpy;
+    constexpr int total_elements = ROWS * COLS;
+    constexpr int total_memcpy = total_elements / elem_per_memcpy;
+    constexpr int calls_per_thread = (total_memcpy + THREADS - 1) / THREADS;
+
+    uint32_t dst_ptr = static_cast<uint32_t>(__cvta_generic_to_shared(&dst.data[0]));
+
+    #pragma unroll
+    for (int i = 0; i < calls_per_thread; i++) {
+        int load_idx = i * THREADS + threadIdx.x;
+        if (load_idx < total_memcpy) {
+            int row = load_idx / memcpy_per_row;
+            int col = (load_idx % memcpy_per_row) * elem_per_memcpy;
+
+            // Use TK's idx() for swizzled destination address
+            uint32_t swizzled_addr = dst.idx(dst_ptr, {row, col});
+            cp_async_16_swizzled(swizzled_addr, &src[row * COLS + col]);
+        }
+    }
+}
+
+// Async load for warp-local use (32 threads)
+template<int ROWS, int COLS>
+__device__ __forceinline__ void load_tile_async_warp(st<bf16, ROWS, COLS>& dst, const bf16* src) {
+    constexpr int elem_per_memcpy = 8;  // 16 bytes / 2 bytes per bf16
+    constexpr int memcpy_per_row = COLS / elem_per_memcpy;
+    constexpr int total_elements = ROWS * COLS;
+    constexpr int total_memcpy = total_elements / elem_per_memcpy;
+    constexpr int WARP_SIZE = 32;
+    constexpr int calls_per_thread = (total_memcpy + WARP_SIZE - 1) / WARP_SIZE;
+
+    const int lane = kittens::laneid();
+    uint32_t dst_ptr = static_cast<uint32_t>(__cvta_generic_to_shared(&dst.data[0]));
+
+    #pragma unroll
+    for (int i = 0; i < calls_per_thread; i++) {
+        int load_idx = i * WARP_SIZE + lane;
+        if (load_idx < total_memcpy) {
+            int row = load_idx / memcpy_per_row;
+            int col = (load_idx % memcpy_per_row) * elem_per_memcpy;
+
+            // Use TK's idx() for swizzled destination address
+            uint32_t swizzled_addr = dst.idx(dst_ptr, {row, col});
+            cp_async_16_swizzled(swizzled_addr, &src[row * COLS + col]);
+        }
+    }
+}
+
 template<int chunk_size, int d_head>
 struct attn_seq_first_globals {
     gl<bf16, -1, -1, -1, -1> output;
@@ -46,14 +120,17 @@ attn_seq_first_tk(const __grid_constant__ attn_seq_first_globals<chunk_size, d_h
     const int* seq_mapping = g.seq_chunk_map + seq_idx * g.seq_chunk_map_stride;
 
     extern __shared__ alignment_dummy __shm[];
-    shared_allocator al((int*)&__shm[0]);
 
-    sv<bf16, d_head> &Q_sv = al.allocate<sv<bf16, d_head>>();
-    sv<float, d_head> *all_out_sv = al.allocate<sv<float, d_head>, NUM_WARPS>();
+    // Use regular allocator for vectors (no swizzling needed)
+    shared_allocator vec_al((int*)&__shm[0]);
+    sv<bf16, d_head> &Q_sv = vec_al.allocate<sv<bf16, d_head>>();
+    sv<float, d_head> *all_out_sv = vec_al.allocate<sv<float, d_head>, NUM_WARPS>();
     sv<float, d_head> &out_sv = all_out_sv[warp];
-    
-    // KV tiles: [NUM_WARPS] of st
-    st<bf16, chunk_size, d_head> *KV_tiles = al.allocate<st<bf16, chunk_size, d_head>, NUM_WARPS>();
+
+    // Use TMA-swizzle allocator for KV tiles (needed for async loads)
+    // Start after the vector allocations
+    tma_swizzle_allocator tile_al((int*)vec_al.ptr);
+    st<bf16, chunk_size, d_head> *KV_tiles = tile_al.allocate<st<bf16, chunk_size, d_head>, NUM_WARPS>();
     st<bf16, chunk_size, d_head> &KV_s = KV_tiles[warp];
 
     __shared__ float warp_max[NUM_WARPS];
@@ -121,20 +198,26 @@ attn_seq_first_tk(const __grid_constant__ attn_seq_first_globals<chunk_size, d_h
             continue;
         }
 
-        // Path B: Fresh
+        // Path B: Fresh computation with pipelined memory loads
         const bf16* K_ptr = reinterpret_cast<const bf16*>(g.keys[chunk_idx]) + kv_row_offset;
         const bf16* V_ptr = reinterpret_cast<const bf16*>(g.values[chunk_idx]) + kv_row_offset;
 
-        // Manual load K into KV_s (per warp)
-        for(int j = lane; j < chunk_size * d_head; j += 32) {
-            // kv_dst[j] = K_ptr[j]; // Linear write is WRONG for swizzled st
-            KV_s[{j / d_head, j % d_head}] = K_ptr[j];
-        }
-        __syncwarp(); 
-        
+        // Phase 1: Load K asynchronously
+        load_tile_async_warp<chunk_size, d_head>(KV_s, K_ptr);
+        cp_async_commit();
+        cp_async_wait<0>();
+        __syncwarp();
+
+        // Load K from shared memory to registers (freeing KV_s for V)
         kv_tile_t K_r;
         warp::load(K_r, KV_s);
 
+        // Phase 2: Start V load in background (overlaps with Q @ K^T computation)
+        // KV_s is now free since K is in registers
+        load_tile_async_warp<chunk_size, d_head>(KV_s, V_ptr);
+        cp_async_commit();  // V load now in flight
+
+        // Compute Q @ K^T while V loads in background
         q_rv_t Q_rv;
         warp::load(Q_rv, Q_sv);
 
@@ -146,6 +229,7 @@ attn_seq_first_tk(const __grid_constant__ attn_seq_first_globals<chunk_size, d_h
         warp::row_sum(scores_cv, QK_tile);
         warp::mul(scores_cv, scores_cv, g.scale);
 
+        // Apply causal mask if needed
         if (i == chunk_num - 1 && last_chunk_unmask_tokens != 0) {
             warp::apply(scores_cv, scores_cv,
                         [last_chunk_unmask_tokens] __device__ (int idx, float v) {
@@ -153,6 +237,7 @@ attn_seq_first_tk(const __grid_constant__ attn_seq_first_globals<chunk_size, d_h
                         });
         }
 
+        // Softmax computation (still overlapping with V load)
         float chunk_max;
         warp::max(chunk_max, scores_cv, score_max);
         warp::sub(scores_cv, scores_cv, chunk_max);
@@ -165,12 +250,11 @@ attn_seq_first_tk(const __grid_constant__ attn_seq_first_globals<chunk_size, d_h
         score_max = chunk_max;
         score_sum = score_sum * scale_old + chunk_sum;
 
-        // Manual load V
-        for(int j = lane; j < chunk_size * d_head; j += 32) {
-            KV_s[{j / d_head, j % d_head}] = V_ptr[j];
-        }
-        __syncwarp(); 
+        // Phase 3: Wait for V load to complete (should be done by now)
+        cp_async_wait<0>();
+        __syncwarp();
 
+        // Load V from shared memory to registers
         kv_tile_t V_r;
         warp::load(V_r, KV_s);
 
