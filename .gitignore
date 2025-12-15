@@ -14,3 +14,10 @@ __pycache__/
 *.swo
 *~
 
+# CMakeFiles and .cmake files
+CMakeFiles/
+*.cmake
+*.make
+**/compile_commands.json
+
+_deps/

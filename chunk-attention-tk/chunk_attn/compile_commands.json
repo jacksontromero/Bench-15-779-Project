@@ -1,1 +1,140 @@
-./build/compile_commands.json
+[
+{
+  "directory": "/workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/spdlog-build",
+  "command": "/usr/bin/c++ -DNVTX_DISABLE -DSPDLOG_COMPILED_LIB -D_GLIBCXX_USE_CXX11_ABI=0 -I/workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/spdlog-src/include -O3 -DNDEBUG -std=c++17 -fPIC -o CMakeFiles/spdlog.dir/src/spdlog.cpp.o -c /workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/spdlog-src/src/spdlog.cpp",
+  "file": "/workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/spdlog-src/src/spdlog.cpp",
+  "output": "_deps/spdlog-build/CMakeFiles/spdlog.dir/src/spdlog.cpp.o"
+},
+{
+  "directory": "/workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/spdlog-build",
+  "command": "/usr/bin/c++ -DNVTX_DISABLE -DSPDLOG_COMPILED_LIB -D_GLIBCXX_USE_CXX11_ABI=0 -I/workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/spdlog-src/include -O3 -DNDEBUG -std=c++17 -fPIC -o CMakeFiles/spdlog.dir/src/stdout_sinks.cpp.o -c /workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/spdlog-src/src/stdout_sinks.cpp",
+  "file": "/workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/spdlog-src/src/stdout_sinks.cpp",
+  "output": "_deps/spdlog-build/CMakeFiles/spdlog.dir/src/stdout_sinks.cpp.o"
+},
+{
+  "directory": "/workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/spdlog-build",
+  "command": "/usr/bin/c++ -DNVTX_DISABLE -DSPDLOG_COMPILED_LIB -D_GLIBCXX_USE_CXX11_ABI=0 -I/workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/spdlog-src/include -O3 -DNDEBUG -std=c++17 -fPIC -o CMakeFiles/spdlog.dir/src/color_sinks.cpp.o -c /workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/spdlog-src/src/color_sinks.cpp",
+  "file": "/workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/spdlog-src/src/color_sinks.cpp",
+  "output": "_deps/spdlog-build/CMakeFiles/spdlog.dir/src/color_sinks.cpp.o"
+},
+{
+  "directory": "/workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/spdlog-build",
+  "command": "/usr/bin/c++ -DNVTX_DISABLE -DSPDLOG_COMPILED_LIB -D_GLIBCXX_USE_CXX11_ABI=0 -I/workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/spdlog-src/include -O3 -DNDEBUG -std=c++17 -fPIC -o CMakeFiles/spdlog.dir/src/file_sinks.cpp.o -c /workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/spdlog-src/src/file_sinks.cpp",
+  "file": "/workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/spdlog-src/src/file_sinks.cpp",
+  "output": "_deps/spdlog-build/CMakeFiles/spdlog.dir/src/file_sinks.cpp.o"
+},
+{
+  "directory": "/workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/spdlog-build",
+  "command": "/usr/bin/c++ -DNVTX_DISABLE -DSPDLOG_COMPILED_LIB -D_GLIBCXX_USE_CXX11_ABI=0 -I/workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/spdlog-src/include -O3 -DNDEBUG -std=c++17 -fPIC -o CMakeFiles/spdlog.dir/src/async.cpp.o -c /workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/spdlog-src/src/async.cpp",
+  "file": "/workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/spdlog-src/src/async.cpp",
+  "output": "_deps/spdlog-build/CMakeFiles/spdlog.dir/src/async.cpp.o"
+},
+{
+  "directory": "/workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/spdlog-build",
+  "command": "/usr/bin/c++ -DNVTX_DISABLE -DSPDLOG_COMPILED_LIB -D_GLIBCXX_USE_CXX11_ABI=0 -I/workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/spdlog-src/include -O3 -DNDEBUG -std=c++17 -fPIC -o CMakeFiles/spdlog.dir/src/cfg.cpp.o -c /workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/spdlog-src/src/cfg.cpp",
+  "file": "/workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/spdlog-src/src/cfg.cpp",
+  "output": "_deps/spdlog-build/CMakeFiles/spdlog.dir/src/cfg.cpp.o"
+},
+{
+  "directory": "/workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/spdlog-build",
+  "command": "/usr/bin/c++ -DNVTX_DISABLE -DSPDLOG_COMPILED_LIB -D_GLIBCXX_USE_CXX11_ABI=0 -I/workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/spdlog-src/include -O3 -DNDEBUG -std=c++17 -fPIC -o CMakeFiles/spdlog.dir/src/bundled_fmtlib_format.cpp.o -c /workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/spdlog-src/src/bundled_fmtlib_format.cpp",
+  "file": "/workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/spdlog-src/src/bundled_fmtlib_format.cpp",
+  "output": "_deps/spdlog-build/CMakeFiles/spdlog.dir/src/bundled_fmtlib_format.cpp.o"
+},
+{
+  "directory": "/workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/googletest-build/googletest",
+  "command": "/usr/bin/c++ -DNVTX_DISABLE -D_GLIBCXX_USE_CXX11_ABI=0 -I/workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/googletest-src/googletest/include -I/workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/googletest-src/googletest -O3 -DNDEBUG -std=c++17 -fPIC -Wall -Wshadow -Wundef -Wno-error=dangling-else -DGTEST_HAS_PTHREAD=1 -fexceptions -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -o CMakeFiles/gtest.dir/src/gtest-all.cc.o -c /workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/googletest-src/googletest/src/gtest-all.cc",
+  "file": "/workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/googletest-src/googletest/src/gtest-all.cc",
+  "output": "_deps/googletest-build/googletest/CMakeFiles/gtest.dir/src/gtest-all.cc.o"
+},
+{
+  "directory": "/workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/googletest-build/googletest",
+  "command": "/usr/bin/c++ -DNVTX_DISABLE -D_GLIBCXX_USE_CXX11_ABI=0 -isystem /workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/googletest-src/googletest/include -isystem /workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/googletest-src/googletest -O3 -DNDEBUG -std=c++17 -fPIC -Wall -Wshadow -Wundef -Wno-error=dangling-else -DGTEST_HAS_PTHREAD=1 -fexceptions -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -o CMakeFiles/gtest_main.dir/src/gtest_main.cc.o -c /workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/googletest-src/googletest/src/gtest_main.cc",
+  "file": "/workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/googletest-src/googletest/src/gtest_main.cc",
+  "output": "_deps/googletest-build/googletest/CMakeFiles/gtest_main.dir/src/gtest_main.cc.o"
+},
+{
+  "directory": "/workspace/15-779-Project/chunk-attention-tk/chunk_attn/cpp/chunk_attn",
+  "command": "/usr/bin/c++ -DNVTX_DISABLE -DUSE_C10D_GLOO -DUSE_C10D_NCCL -DUSE_CUDA=1 -DUSE_DISTRIBUTED -DUSE_RPC -DUSE_TENSORPIPE -D_GLIBCXX_USE_CXX11_ABI=0 -I/workspace/15-779-Project/chunk-attention-tk/chunk_attn/cpp/chunk_attn -I/workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/spdlog-src/include -I/workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/nvtx-src/include -isystem /venv/myenv/lib/python3.10/site-packages/torch/include -isystem /venv/myenv/lib/python3.10/site-packages/torch/include/torch/csrc/api/include -isystem /usr/local/cuda/include -O3 -DNDEBUG -std=gnu++17 -fPIC -D_GLIBCXX_USE_CXX11_ABI=0 -o CMakeFiles/chunk_attn_lib.dir/chunk.cpp.o -c /workspace/15-779-Project/chunk-attention-tk/chunk_attn/cpp/chunk_attn/chunk.cpp",
+  "file": "/workspace/15-779-Project/chunk-attention-tk/chunk_attn/cpp/chunk_attn/chunk.cpp",
+  "output": "cpp/chunk_attn/CMakeFiles/chunk_attn_lib.dir/chunk.cpp.o"
+},
+{
+  "directory": "/workspace/15-779-Project/chunk-attention-tk/chunk_attn/cpp/chunk_attn",
+  "command": "/usr/bin/c++ -DNVTX_DISABLE -DUSE_C10D_GLOO -DUSE_C10D_NCCL -DUSE_CUDA=1 -DUSE_DISTRIBUTED -DUSE_RPC -DUSE_TENSORPIPE -D_GLIBCXX_USE_CXX11_ABI=0 -I/workspace/15-779-Project/chunk-attention-tk/chunk_attn/cpp/chunk_attn -I/workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/spdlog-src/include -I/workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/nvtx-src/include -isystem /venv/myenv/lib/python3.10/site-packages/torch/include -isystem /venv/myenv/lib/python3.10/site-packages/torch/include/torch/csrc/api/include -isystem /usr/local/cuda/include -O3 -DNDEBUG -std=gnu++17 -fPIC -D_GLIBCXX_USE_CXX11_ABI=0 -o CMakeFiles/chunk_attn_lib.dir/chunk_allocator.cpp.o -c /workspace/15-779-Project/chunk-attention-tk/chunk_attn/cpp/chunk_attn/chunk_allocator.cpp",
+  "file": "/workspace/15-779-Project/chunk-attention-tk/chunk_attn/cpp/chunk_attn/chunk_allocator.cpp",
+  "output": "cpp/chunk_attn/CMakeFiles/chunk_attn_lib.dir/chunk_allocator.cpp.o"
+},
+{
+  "directory": "/workspace/15-779-Project/chunk-attention-tk/chunk_attn/cpp/chunk_attn",
+  "command": "/usr/bin/c++ -DNVTX_DISABLE -DUSE_C10D_GLOO -DUSE_C10D_NCCL -DUSE_CUDA=1 -DUSE_DISTRIBUTED -DUSE_RPC -DUSE_TENSORPIPE -D_GLIBCXX_USE_CXX11_ABI=0 -I/workspace/15-779-Project/chunk-attention-tk/chunk_attn/cpp/chunk_attn -I/workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/spdlog-src/include -I/workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/nvtx-src/include -isystem /venv/myenv/lib/python3.10/site-packages/torch/include -isystem /venv/myenv/lib/python3.10/site-packages/torch/include/torch/csrc/api/include -isystem /usr/local/cuda/include -O3 -DNDEBUG -std=gnu++17 -fPIC -D_GLIBCXX_USE_CXX11_ABI=0 -o CMakeFiles/chunk_attn_lib.dir/attention.cpp.o -c /workspace/15-779-Project/chunk-attention-tk/chunk_attn/cpp/chunk_attn/attention.cpp",
+  "file": "/workspace/15-779-Project/chunk-attention-tk/chunk_attn/cpp/chunk_attn/attention.cpp",
+  "output": "cpp/chunk_attn/CMakeFiles/chunk_attn_lib.dir/attention.cpp.o"
+},
+{
+  "directory": "/workspace/15-779-Project/chunk-attention-tk/chunk_attn/cpp/chunk_attn",
+  "command": "/usr/bin/c++ -DNVTX_DISABLE -DUSE_C10D_GLOO -DUSE_C10D_NCCL -DUSE_CUDA=1 -DUSE_DISTRIBUTED -DUSE_RPC -DUSE_TENSORPIPE -D_GLIBCXX_USE_CXX11_ABI=0 -I/workspace/15-779-Project/chunk-attention-tk/chunk_attn/cpp/chunk_attn -I/workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/spdlog-src/include -I/workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/nvtx-src/include -isystem /venv/myenv/lib/python3.10/site-packages/torch/include -isystem /venv/myenv/lib/python3.10/site-packages/torch/include/torch/csrc/api/include -isystem /usr/local/cuda/include -O3 -DNDEBUG -std=gnu++17 -fPIC -D_GLIBCXX_USE_CXX11_ABI=0 -o CMakeFiles/chunk_attn_lib.dir/task_executor.cpp.o -c /workspace/15-779-Project/chunk-attention-tk/chunk_attn/cpp/chunk_attn/task_executor.cpp",
+  "file": "/workspace/15-779-Project/chunk-attention-tk/chunk_attn/cpp/chunk_attn/task_executor.cpp",
+  "output": "cpp/chunk_attn/CMakeFiles/chunk_attn_lib.dir/task_executor.cpp.o"
+},
+{
+  "directory": "/workspace/15-779-Project/chunk-attention-tk/chunk_attn/cpp/chunk_attn",
+  "command": "/usr/bin/c++ -DNVTX_DISABLE -DUSE_C10D_GLOO -DUSE_C10D_NCCL -DUSE_CUDA=1 -DUSE_DISTRIBUTED -DUSE_RPC -DUSE_TENSORPIPE -D_GLIBCXX_USE_CXX11_ABI=0 -I/workspace/15-779-Project/chunk-attention-tk/chunk_attn/cpp/chunk_attn -I/workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/spdlog-src/include -I/workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/nvtx-src/include -isystem /venv/myenv/lib/python3.10/site-packages/torch/include -isystem /venv/myenv/lib/python3.10/site-packages/torch/include/torch/csrc/api/include -isystem /usr/local/cuda/include -O3 -DNDEBUG -std=gnu++17 -fPIC -D_GLIBCXX_USE_CXX11_ABI=0 -o CMakeFiles/chunk_attn_lib.dir/logging.cpp.o -c /workspace/15-779-Project/chunk-attention-tk/chunk_attn/cpp/chunk_attn/logging.cpp",
+  "file": "/workspace/15-779-Project/chunk-attention-tk/chunk_attn/cpp/chunk_attn/logging.cpp",
+  "output": "cpp/chunk_attn/CMakeFiles/chunk_attn_lib.dir/logging.cpp.o"
+},
+{
+  "directory": "/workspace/15-779-Project/chunk-attention-tk/chunk_attn/cpp/chunk_attn",
+  "command": "/usr/bin/c++ -DNVTX_DISABLE -DUSE_C10D_GLOO -DUSE_C10D_NCCL -DUSE_CUDA=1 -DUSE_DISTRIBUTED -DUSE_RPC -DUSE_TENSORPIPE -D_GLIBCXX_USE_CXX11_ABI=0 -I/workspace/15-779-Project/chunk-attention-tk/chunk_attn/cpp/chunk_attn -I/workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/spdlog-src/include -I/workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/nvtx-src/include -isystem /venv/myenv/lib/python3.10/site-packages/torch/include -isystem /venv/myenv/lib/python3.10/site-packages/torch/include/torch/csrc/api/include -isystem /usr/local/cuda/include -O3 -DNDEBUG -std=gnu++17 -fPIC -D_GLIBCXX_USE_CXX11_ABI=0 -o CMakeFiles/chunk_attn_lib.dir/str_utils.cpp.o -c /workspace/15-779-Project/chunk-attention-tk/chunk_attn/cpp/chunk_attn/str_utils.cpp",
+  "file": "/workspace/15-779-Project/chunk-attention-tk/chunk_attn/cpp/chunk_attn/str_utils.cpp",
+  "output": "cpp/chunk_attn/CMakeFiles/chunk_attn_lib.dir/str_utils.cpp.o"
+},
+{
+  "directory": "/workspace/15-779-Project/chunk-attention-tk/chunk_attn/cpp/chunk_attn",
+  "command": "/usr/local/cuda/bin/nvcc -forward-unknown-to-host-compiler -DNVTX_DISABLE -DUSE_C10D_GLOO -DUSE_C10D_NCCL -DUSE_CUDA=1 -DUSE_DISTRIBUTED -DUSE_RPC -DUSE_TENSORPIPE -D_GLIBCXX_USE_CXX11_ABI=0 --options-file CMakeFiles/chunk_attn_lib.dir/includes_CUDA.rsp  -DONNX_NAMESPACE=onnx_c2 -gencode arch=compute_90,code=sm_90 -Xcudafe --diag_suppress=cc_clobber_ignored,--diag_suppress=field_without_dll_interface,--diag_suppress=base_class_has_different_dll_interface,--diag_suppress=dll_interface_conflict_none_assumed,--diag_suppress=dll_interface_conflict_dllexport_assumed,--diag_suppress=bad_friend_decl --expt-relaxed-constexpr --expt-extended-lambda -O3 -DNDEBUG -std=c++17 \"--generate-code=arch=compute_90a,code=[compute_90a,sm_90a]\" -Xcompiler=-fPIC -O3 -D_GLIBCXX_USE_CXX11_ABI=0 -x cu -c /workspace/15-779-Project/chunk-attention-tk/chunk_attn/cpp/chunk_attn/kernel_cuda.cu -o CMakeFiles/chunk_attn_lib.dir/kernel_cuda.cu.o",
+  "file": "/workspace/15-779-Project/chunk-attention-tk/chunk_attn/cpp/chunk_attn/kernel_cuda.cu",
+  "output": "cpp/chunk_attn/CMakeFiles/chunk_attn_lib.dir/kernel_cuda.cu.o"
+},
+{
+  "directory": "/workspace/15-779-Project/chunk-attention-tk/chunk_attn/cpp/chunk_attn",
+  "command": "/usr/local/cuda/bin/nvcc -forward-unknown-to-host-compiler -DNVTX_DISABLE -DUSE_C10D_GLOO -DUSE_C10D_NCCL -DUSE_CUDA=1 -DUSE_DISTRIBUTED -DUSE_RPC -DUSE_TENSORPIPE -D_GLIBCXX_USE_CXX11_ABI=0 --options-file CMakeFiles/chunk_attn_lib.dir/includes_CUDA.rsp  -DONNX_NAMESPACE=onnx_c2 -gencode arch=compute_90,code=sm_90 -Xcudafe --diag_suppress=cc_clobber_ignored,--diag_suppress=field_without_dll_interface,--diag_suppress=base_class_has_different_dll_interface,--diag_suppress=dll_interface_conflict_none_assumed,--diag_suppress=dll_interface_conflict_dllexport_assumed,--diag_suppress=bad_friend_decl --expt-relaxed-constexpr --expt-extended-lambda -O3 -DNDEBUG -std=c++17 \"--generate-code=arch=compute_90a,code=[compute_90a,sm_90a]\" -Xcompiler=-fPIC -O3 -D_GLIBCXX_USE_CXX11_ABI=0 -x cu -c /workspace/15-779-Project/chunk-attention-tk/chunk_attn/cpp/chunk_attn/pos_encoding_kernels.cu -o CMakeFiles/chunk_attn_lib.dir/pos_encoding_kernels.cu.o",
+  "file": "/workspace/15-779-Project/chunk-attention-tk/chunk_attn/cpp/chunk_attn/pos_encoding_kernels.cu",
+  "output": "cpp/chunk_attn/CMakeFiles/chunk_attn_lib.dir/pos_encoding_kernels.cu.o"
+},
+{
+  "directory": "/workspace/15-779-Project/chunk-attention-tk/chunk_attn/cpp/chunk_attn",
+  "command": "/usr/local/cuda/bin/nvcc -forward-unknown-to-host-compiler -DNVTX_DISABLE -DUSE_C10D_GLOO -DUSE_C10D_NCCL -DUSE_CUDA=1 -DUSE_DISTRIBUTED -DUSE_RPC -DUSE_TENSORPIPE -D_GLIBCXX_USE_CXX11_ABI=0 --options-file CMakeFiles/chunk_attn_lib.dir/includes_CUDA.rsp  -DONNX_NAMESPACE=onnx_c2 -gencode arch=compute_90,code=sm_90 -Xcudafe --diag_suppress=cc_clobber_ignored,--diag_suppress=field_without_dll_interface,--diag_suppress=base_class_has_different_dll_interface,--diag_suppress=dll_interface_conflict_none_assumed,--diag_suppress=dll_interface_conflict_dllexport_assumed,--diag_suppress=bad_friend_decl --expt-relaxed-constexpr --expt-extended-lambda -O3 -DNDEBUG -std=c++17 \"--generate-code=arch=compute_90a,code=[compute_90a,sm_90a]\" -Xcompiler=-fPIC -O3 -D_GLIBCXX_USE_CXX11_ABI=0 -x cu -c /workspace/15-779-Project/chunk-attention-tk/chunk_attn/cpp/chunk_attn/layernorm_kernels.cu -o CMakeFiles/chunk_attn_lib.dir/layernorm_kernels.cu.o",
+  "file": "/workspace/15-779-Project/chunk-attention-tk/chunk_attn/cpp/chunk_attn/layernorm_kernels.cu",
+  "output": "cpp/chunk_attn/CMakeFiles/chunk_attn_lib.dir/layernorm_kernels.cu.o"
+},
+{
+  "directory": "/workspace/15-779-Project/chunk-attention-tk/chunk_attn/cpp/chunk_attn",
+  "command": "/usr/bin/c++ -DNVTX_DISABLE -DUSE_C10D_GLOO -DUSE_C10D_NCCL -DUSE_CUDA=1 -DUSE_DISTRIBUTED -DUSE_RPC -DUSE_TENSORPIPE -D_GLIBCXX_USE_CXX11_ABI=0 -Dchunk_attn_c_EXPORTS -I/workspace/15-779-Project/chunk-attention-tk/chunk_attn/cpp/chunk_attn -I/workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/spdlog-src/include -I/workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/nvtx-src/include -isystem /workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/pybind11-src/include -isystem /venv/main/include/python3.12 -isystem /venv/myenv/lib/python3.10/site-packages/torch/include -isystem /venv/myenv/lib/python3.10/site-packages/torch/include/torch/csrc/api/include -isystem /usr/local/cuda/include -O3 -DNDEBUG -std=gnu++17 -fPIC -fvisibility=hidden -flto -fno-fat-lto-objects -D_GLIBCXX_USE_CXX11_ABI=0 -o CMakeFiles/chunk_attn_c.dir/python_exports.cpp.o -c /workspace/15-779-Project/chunk-attention-tk/chunk_attn/cpp/chunk_attn/python_exports.cpp",
+  "file": "/workspace/15-779-Project/chunk-attention-tk/chunk_attn/cpp/chunk_attn/python_exports.cpp",
+  "output": "cpp/chunk_attn/CMakeFiles/chunk_attn_c.dir/python_exports.cpp.o"
+},
+{
+  "directory": "/workspace/15-779-Project/chunk-attention-tk/chunk_attn/cpp/chunk_attn",
+  "command": "/usr/bin/c++ -DNVTX_DISABLE -DUSE_C10D_GLOO -DUSE_C10D_NCCL -DUSE_CUDA=1 -DUSE_DISTRIBUTED -DUSE_RPC -DUSE_TENSORPIPE -D_GLIBCXX_USE_CXX11_ABI=0 -Dchunk_attn_c_EXPORTS -I/workspace/15-779-Project/chunk-attention-tk/chunk_attn/cpp/chunk_attn -I/workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/spdlog-src/include -I/workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/nvtx-src/include -isystem /workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/pybind11-src/include -isystem /venv/main/include/python3.12 -isystem /venv/myenv/lib/python3.10/site-packages/torch/include -isystem /venv/myenv/lib/python3.10/site-packages/torch/include/torch/csrc/api/include -isystem /usr/local/cuda/include -O3 -DNDEBUG -std=gnu++17 -fPIC -fvisibility=hidden -flto -fno-fat-lto-objects -D_GLIBCXX_USE_CXX11_ABI=0 -o CMakeFiles/chunk_attn_c.dir/python_exports_ops.cpp.o -c /workspace/15-779-Project/chunk-attention-tk/chunk_attn/cpp/chunk_attn/python_exports_ops.cpp",
+  "file": "/workspace/15-779-Project/chunk-attention-tk/chunk_attn/cpp/chunk_attn/python_exports_ops.cpp",
+  "output": "cpp/chunk_attn/CMakeFiles/chunk_attn_c.dir/python_exports_ops.cpp.o"
+},
+{
+  "directory": "/workspace/15-779-Project/chunk-attention-tk/chunk_attn/cpp/tests",
+  "command": "/usr/bin/c++ -DNVTX_DISABLE -DUSE_C10D_GLOO -DUSE_C10D_NCCL -DUSE_CUDA=1 -DUSE_DISTRIBUTED -DUSE_RPC -DUSE_TENSORPIPE -D_GLIBCXX_USE_CXX11_ABI=0 -I/workspace/15-779-Project/chunk-attention-tk/chunk_attn/cpp/chunk_attn -I/workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/spdlog-src/include -I/workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/nvtx-src/include -isystem /workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/googletest-src/googletest/include -isystem /workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/googletest-src/googletest -isystem /venv/myenv/lib/python3.10/site-packages/torch/include -isystem /venv/myenv/lib/python3.10/site-packages/torch/include/torch/csrc/api/include -isystem /usr/local/cuda/include -O3 -DNDEBUG -std=gnu++17 -fPIE -D_GLIBCXX_USE_CXX11_ABI=0 -o CMakeFiles/test_chunk_attn.dir/test_gpu_kernel.cpp.o -c /workspace/15-779-Project/chunk-attention-tk/chunk_attn/cpp/tests/test_gpu_kernel.cpp",
+  "file": "/workspace/15-779-Project/chunk-attention-tk/chunk_attn/cpp/tests/test_gpu_kernel.cpp",
+  "output": "cpp/tests/CMakeFiles/test_chunk_attn.dir/test_gpu_kernel.cpp.o"
+},
+{
+  "directory": "/workspace/15-779-Project/chunk-attention-tk/chunk_attn/cpp/tests",
+  "command": "/usr/bin/c++ -DNVTX_DISABLE -DUSE_C10D_GLOO -DUSE_C10D_NCCL -DUSE_CUDA=1 -DUSE_DISTRIBUTED -DUSE_RPC -DUSE_TENSORPIPE -D_GLIBCXX_USE_CXX11_ABI=0 -I/workspace/15-779-Project/chunk-attention-tk/chunk_attn/cpp/chunk_attn -I/workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/spdlog-src/include -I/workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/nvtx-src/include -isystem /venv/myenv/lib/python3.10/site-packages/torch/include -isystem /venv/myenv/lib/python3.10/site-packages/torch/include/torch/csrc/api/include -isystem /usr/local/cuda/include -O3 -DNDEBUG -std=gnu++17 -fPIE -D_GLIBCXX_USE_CXX11_ABI=0 -o CMakeFiles/bench_chunk_first_kernel.dir/bench_chunk_first_kernel.cpp.o -c /workspace/15-779-Project/chunk-attention-tk/chunk_attn/cpp/tests/bench_chunk_first_kernel.cpp",
+  "file": "/workspace/15-779-Project/chunk-attention-tk/chunk_attn/cpp/tests/bench_chunk_first_kernel.cpp",
+  "output": "cpp/tests/CMakeFiles/bench_chunk_first_kernel.dir/bench_chunk_first_kernel.cpp.o"
+},
+{
+  "directory": "/workspace/15-779-Project/chunk-attention-tk/chunk_attn/cpp/tests",
+  "command": "/usr/bin/c++ -DNVTX_DISABLE -DUSE_C10D_GLOO -DUSE_C10D_NCCL -DUSE_CUDA=1 -DUSE_DISTRIBUTED -DUSE_RPC -DUSE_TENSORPIPE -D_GLIBCXX_USE_CXX11_ABI=0 -I/workspace/15-779-Project/chunk-attention-tk/chunk_attn/cpp/chunk_attn -I/workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/spdlog-src/include -I/workspace/15-779-Project/chunk-attention-tk/chunk_attn/_deps/nvtx-src/include -isystem /venv/myenv/lib/python3.10/site-packages/torch/include -isystem /venv/myenv/lib/python3.10/site-packages/torch/include/torch/csrc/api/include -isystem /usr/local/cuda/include -O3 -DNDEBUG -std=gnu++17 -fPIE -D_GLIBCXX_USE_CXX11_ABI=0 -o CMakeFiles/bench_seq_first_kernel.dir/bench_seq_first_kernel.cpp.o -c /workspace/15-779-Project/chunk-attention-tk/chunk_attn/cpp/tests/bench_seq_first_kernel.cpp",
+  "file": "/workspace/15-779-Project/chunk-attention-tk/chunk_attn/cpp/tests/bench_seq_first_kernel.cpp",
+  "output": "cpp/tests/CMakeFiles/bench_seq_first_kernel.dir/bench_seq_first_kernel.cpp.o"
+}
+]

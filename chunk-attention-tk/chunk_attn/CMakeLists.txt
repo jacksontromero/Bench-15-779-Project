@@ -13,8 +13,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-    # Match the default ABI used by most modern PyTorch builds.
-    add_definitions(-D_GLIBCXX_USE_CXX11_ABI=1)
+    add_definitions(-D_GLIBCXX_USE_CXX11_ABI=0)
 endif()
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     add_compile_definitions(NOMINMAX)
@@ -68,7 +67,6 @@ if(${Python3_FOUND} AND ${Python3_Interpreter_FOUND})
         ${CMAKE_SOURCE_DIR}/src/chunk_attn/lib/
         #    COMMAND "${Python3_EXECUTABLE}" setup.py bdist_wheel ${DIST_PLATFORM}
         COMMAND "${Python3_EXECUTABLE}" -m pip install -e .
-        # Stub generation is optional. Skip it to avoid fragile quoting / environment issues.
-        COMMAND "${Python3_EXECUTABLE}" -c \"print('Skipping mypy.stubgen (optional)')\"
+        COMMAND "${Python3_EXECUTABLE}" -c \"import mypy.stubgen\; mypy.stubgen.main(['-p', 'chunk_attn.lib.chunk_attn_c', '-o', './src'])\"
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 endif()

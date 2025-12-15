@@ -9,6 +9,11 @@ if (USE_CUDA)
     target_link_libraries(bench_chunk_first_kernel
             PRIVATE
             chunk_attn_lib)
+
+    add_executable(bench_seq_first_kernel bench_seq_first_kernel.cpp)
+    target_link_libraries(bench_seq_first_kernel
+            PRIVATE
+            chunk_attn_lib)
 endif ()
 if (USE_MKL)
     target_sources(test_chunk_attn
